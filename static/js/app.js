@@ -31,7 +31,12 @@ function addNote() {
     const title = document.getElementById("note-title").value;
     const tagline = document.getElementById("note-tagline").value;
     const body = document.getElementById("note-body").value;
-    const pinned = document.getElementById("note-pinned").checked ? 1 : 0;
+    const pinned = document.getElementById("note-pinned").checked;
+
+    if (!title || !body) {
+        showError("Title and body are required!");
+        return;
+    }
 
     fetch("/api/notes", {
         method: "POST",
@@ -39,17 +44,21 @@ function addNote() {
         body: JSON.stringify({ title, tagline, body, pinned })
     })
         .then(response => {
-            if (!response.ok) 
-                    throw new Error("Failed to add note!");
+            if (!response.ok) {
+                throw new Error("Failed to add note!");
+            }
             return response.json();
         })
-        .then((data) => {
-            showToast(data.message);
+        .then(data => {
+            showToast("Note added successfully!");
             fetchNotes();
-            clearForm();
         })
-        .catch(error => showError("Error adding note!"));
+        .catch(error => {
+            console.error("Error adding note:", error);  // Log error for debugging
+            showError("Error adding note!");
+        });
 }
+
 
 function editNote(id) {
     const newTitle = prompt("Enter new title:");
