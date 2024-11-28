@@ -1,17 +1,20 @@
 from flask import Flask, jsonify, request, render_template
-import mysql.connector
+import psycopg2
+from psycopg2.extras import RealDictCursor
 from flask_cors import CORS
+import os
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for cross-origin requests
 
 # Database connection
 def get_db_connection():
-    return mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="",  # Replace with your MySQL root password
-        database="notekeeper"
+    return psycopg2.connect(
+        dbname="notekeeper_7c09",
+        user="notekeeper_7c09_user",
+        password="CFRNeEjIsRroI747Crtim2eKnDh7TjWm",
+        host="dpg-ct475t3tq21c7391ierg-a",
+        port="5432"
     )
 
 # Routes
@@ -25,15 +28,15 @@ def get_notes():
     per_page = 6
 
     connection = get_db_connection()
-    cursor = connection.cursor(dictionary=True)
+    cursor = connection.cursor(cursor_factory=RealDictCursor)
 
     # Get all pinned notes first
-    cursor.execute("SELECT * FROM notes WHERE pinned = 1 ORDER BY id DESC")
+    cursor.execute("SELECT * FROM notes WHERE pinned = TRUE ORDER BY id DESC")
     pinned_notes = cursor.fetchall()
 
     # Get non-pinned notes with pagination
     offset = (page - 1) * per_page
-    cursor.execute("SELECT * FROM notes WHERE pinned = 0 ORDER BY id DESC LIMIT %s OFFSET %s", (per_page, offset))
+    cursor.execute("SELECT * FROM notes WHERE pinned = FALSE ORDER BY id DESC LIMIT %s OFFSET %s", (per_page, offset))
     unpinned_notes = cursor.fetchall()
 
     cursor.close()
@@ -47,7 +50,7 @@ def create_note():
     title = data.get("title")
     tagline = data.get("tagline")
     body = data.get("body")
-    pinned = data.get("pinned", 0)
+    pinned = data.get("pinned", False)
 
     if not title or not body:
         return jsonify({"error": "Title and body are required!"}), 400
@@ -69,7 +72,7 @@ def update_note(note_id):
     title = data.get("title")
     tagline = data.get("tagline")
     body = data.get("body")
-    pinned = data.get("pinned", 0)
+    pinned = data.get("pinned", False)
 
     connection = get_db_connection()
     cursor = connection.cursor()
@@ -98,4 +101,4 @@ def delete_note(note_id):
     return jsonify({"message": "Note deleted successfully!"})
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=int(os.getenv("PORT", 5000)))
