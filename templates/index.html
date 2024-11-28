@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notekeeper</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Notekeeper</h1>
+        <div class="note-form">
+            <input type="text" id="note-title" placeholder="Title">
+            <input type="text" id="note-tagline" placeholder="Tagline">
+            <textarea id="note-body" placeholder="Write your note..."></textarea>
+            <label>
+                <input type="checkbox" id="note-pinned"> Pin this note
+            </label>
+            <button onclick="addNote()">Add Note</button>
+        </div>
+        <div id="notes-grid"></div>
+        <div class="pagination">
+            <button onclick="prevPage()">Previous</button>
+            <button onclick="nextPage()">Next</button>
+        </div>
+    </div>
+    <div id="toast" class="toast"></div>
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
