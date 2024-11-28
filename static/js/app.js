@@ -1,21 +1,11 @@
 let currentPage = 1;
-function fetchNotes() {
-    fetch("/api/notes?page=1")
-        .then(response => {
-            if (!response.ok) {
-                throw new Error("Failed to fetch notes!");
-            }
-            return response.json();
-        })
-        .then(data => {
-            renderNotes(data);
-        })
-        .catch(error => {
-            console.error("Error fetching notes:", error);
-            alert("Error fetching notes!");
-        });
-}
 
+function fetchNotes() {
+    fetch(`/api/notes?page=${currentPage}`)
+        .then(response => response.json())
+        .then(data => renderNotes(data))
+        .catch(error => showError("Error fetching notes!"));
+}
 
 function renderNotes({ pinned, unpinned }) {
     const notesGrid = document.getElementById("notes-grid");
@@ -41,12 +31,7 @@ function addNote() {
     const title = document.getElementById("note-title").value;
     const tagline = document.getElementById("note-tagline").value;
     const body = document.getElementById("note-body").value;
-    const pinned = document.getElementById("note-pinned").checked;
-
-    if (!title || !body) {
-        showError("Title and body are required!");
-        return;
-    }
+    const pinned = document.getElementById("note-pinned").checked ? 1 : 0;
 
     fetch("/api/notes", {
         method: "POST",
@@ -54,21 +39,17 @@ function addNote() {
         body: JSON.stringify({ title, tagline, body, pinned })
     })
         .then(response => {
-            if (!response.ok) {
-                throw new Error("Failed to add note!");
-            }
+            if (!response.ok) 
+                    throw new Error("Failed to add note!");
             return response.json();
         })
-        .then(data => {
-            showToast("Note added successfully!");
+        .then((data) => {
+            showToast(data.message);
             fetchNotes();
+            clearForm();
         })
-        .catch(error => {
-            console.error("Error adding note:", error);  // Log error for debugging
-            showError("Error adding note!");
-        });
+        .catch(error => showError("Error adding note!"));
 }
-
 
 function editNote(id) {
     const newTitle = prompt("Enter new title:");
