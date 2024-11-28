@@ -1,11 +1,21 @@
 let currentPage = 1;
-
 function fetchNotes() {
-    fetch(`/api/notes?page=${currentPage}`)
-        .then(response => response.json())
-        .then(data => renderNotes(data))
-        .catch(error => showError("Error fetching notes!"));
+    fetch("/api/notes?page=1")
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Failed to fetch notes!");
+            }
+            return response.json();
+        })
+        .then(data => {
+            renderNotes(data);
+        })
+        .catch(error => {
+            console.error("Error fetching notes:", error);
+            alert("Error fetching notes!");
+        });
 }
+
 
 function renderNotes({ pinned, unpinned }) {
     const notesGrid = document.getElementById("notes-grid");
