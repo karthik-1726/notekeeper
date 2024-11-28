@@ -64,7 +64,7 @@ def create_note():
     cursor.close()
     connection.close()
 
-        return jsonify({"message": "Note created successfully!"}), 201
+    return jsonify({"message": "Note created successfully!"}), 201
 
 @app.route("/api/notes/<int:note_id>", methods=["PUT"])
 def update_note(note_id):
@@ -85,20 +85,17 @@ def update_note(note_id):
     connection.commit()
     cursor.close()
     connection.close()
-
     return jsonify({"message": "Note updated successfully!"})
 
 @app.route("/api/notes/<int:note_id>", methods=["DELETE"])
 def delete_note(note_id):
     connection = get_db_connection()
     cursor = connection.cursor()
-
     cursor.execute("DELETE FROM notes WHERE id = %s", (note_id,))
     connection.commit()
     cursor.close()
     connection.close()
-
-     return jsonify({"message": "Note deleted successfully!"})
+    return jsonify({"message": "Note deleted successfully!"})
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.getenv("PORT", 5000)))
