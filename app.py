@@ -7,7 +7,7 @@ import os
 app = Flask(__name__)
 CORS(app)  # Enable CORS for cross-origin requests
 
-# Database connection
+# Database connection function
 def get_db_connection():
     return psycopg2.connect(
         dbname="notekeeper_7c09",
@@ -24,25 +24,29 @@ def index():
 
 @app.route("/api/notes", methods=["GET"])
 def get_notes():
-    page = int(request.args.get("page", 1))
-    per_page = 6
+    try:
+        page = int(request.args.get("page", 1))
+        per_page = 6
 
-    connection = get_db_connection()
-    cursor = connection.cursor(cursor_factory=RealDictCursor)
+        connection = get_db_connection()
+        cursor = connection.cursor(cursor_factory=RealDictCursor)
 
-    # Get all pinned notes first
-    cursor.execute("SELECT * FROM notes WHERE pinned = TRUE ORDER BY id DESC")
-    pinned_notes = cursor.fetchall()
+        # Fetch pinned notes
+        cursor.execute("SELECT * FROM notes WHERE pinned = TRUE ORDER BY id DESC")
+        pinned_notes = cursor.fetchall()
 
-    # Get non-pinned notes with pagination
-    offset = (page - 1) * per_page
-    cursor.execute("SELECT * FROM notes WHERE pinned = FALSE ORDER BY id DESC LIMIT %s OFFSET %s", (per_page, offset))
-    unpinned_notes = cursor.fetchall()
+        # Fetch unpinned notes with pagination
+        offset = (page - 1) * per_page
+        cursor.execute("SELECT * FROM notes WHERE pinned = FALSE ORDER BY id DESC LIMIT %s OFFSET %s", (per_page, offset))
+        unpinned_notes = cursor.fetchall()
 
-    cursor.close()
-    connection.close()
+        cursor.close()
+        connection.close()
 
-    return jsonify({"pinned": pinned_notes, "unpinned": unpinned_notes})
+        return jsonify({"pinned": pinned_notes, "unpinned": unpinned_notes})
+    except Exception as e:
+        print(f"Error fetching notes: {e}")  # Log error for debugging
+        return jsonify({"error": "Error fetching notes!"}), 500
 
 @app.route("/api/notes", methods=["POST"])
 def create_note():
@@ -55,16 +59,20 @@ def create_note():
     if not title or not body:
         return jsonify({"error": "Title and body are required!"}), 400
 
-    connection = get_db_connection()
-    cursor = connection.cursor()
+    try:
+        connection = get_db_connection()
+        cursor = connection.cursor()
 
-    cursor.execute("INSERT INTO notes (title, tagline, body, pinned) VALUES (%s, %s, %s, %s)", 
-                   (title, tagline, body, pinned))
-    connection.commit()
-    cursor.close()
-    connection.close()
+        cursor.execute("INSERT INTO notes (title, tagline, body, pinned) VALUES (%s, %s, %s, %s)", 
+                       (title, tagline, body, pinned))
+        connection.commit()
+        cursor.close()
+        connection.close()
 
-    return jsonify({"message": "Note created successfully!"}), 201
+        return jsonify({"message": "Note created successfully!"}), 201
+    except Exception as e:
+        print(f"Error creating note: {e}")  # Log error for debugging
+        return jsonify({"error": "Error creating note!"}), 500
 
 @app.route("/api/notes/<int:note_id>", methods=["PUT"])
 def update_note(note_id):
@@ -74,31 +82,39 @@ def update_note(note_id):
     body = data.get("body")
     pinned = data.get("pinned", False)
 
-    connection = get_db_connection()
-    cursor = connection.cursor()
+    try:
+        connection = get_db_connection()
+        cursor = connection.cursor()
 
-    cursor.execute("""
-        UPDATE notes
-        SET title = %s, tagline = %s, body = %s, pinned = %s
-        WHERE id = %s
-    """, (title, tagline, body, pinned, note_id))
-    connection.commit()
-    cursor.close()
-    connection.close()
+        cursor.execute("""
+            UPDATE notes
+            SET title = %s, tagline = %s, body = %s, pinned = %s
+            WHERE id = %s
+        """, (title, tagline, body, pinned, note_id))
+        connection.commit()
+        cursor.close()
+        connection.close()
 
-    return jsonify({"message": "Note updated successfully!"})
+        return jsonify({"message": "Note updated successfully!"})
+    except Exception as e:
+        print(f"Error updating note: {e}")  # Log error for debugging
+        return jsonify({"error": "Error updating note!"}), 500
 
 @app.route("/api/notes/<int:note_id>", methods=["DELETE"])
 def delete_note(note_id):
-    connection = get_db_connection()
-    cursor = connection.cursor()
+    try:
+        connection = get_db_connection()
+        cursor = connection.cursor()
 
-    cursor.execute("DELETE FROM notes WHERE id = %s", (note_id,))
-    connection.commit()
-    cursor.close()
-    connection.close()
+        cursor.execute("DELETE FROM notes WHERE id = %s", (note_id,))
+        connection.commit()
+        cursor.close()
+        connection.close()
 
-    return jsonify({"message": "Note deleted successfully!"})
+        return jsonify({"message": "Note deleted successfully!"})
+    except Exception as e:
+        print(f"Error deleting note: {e}")  # Log error for debugging
+        return jsonify({"error": "Error deleting note!"}), 500
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.getenv("PORT", 5000)))
