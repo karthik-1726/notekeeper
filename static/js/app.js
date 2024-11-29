@@ -1,7 +1,10 @@
 let currentPage = 1;
 
 // Set BASE_URL to your deployed backend URL
-const BASE_URL = "https://notekeeper-225l.onrender.com"
+const BASE_URL = window.location.origin.includes("localhost")
+    ? "" // For local testing
+    : window.location.origin; // Use Render domain when deployed
+
 
 // Fetch notes with pagination
 function fetchNotes() {
