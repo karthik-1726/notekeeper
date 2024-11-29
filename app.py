@@ -68,7 +68,8 @@ def create_note():
     title = data.get("title")
     tagline = data.get("tagline")
     body = data.get("body")
-    pinned = data.get("pinned", 0)
+    # Convert pinned to a boolean
+    pinned = bool(data.get("pinned", False))
 
     if not title or not body:
         return jsonify({"error": "Title and body are required!"}), 400
@@ -96,7 +97,8 @@ def update_note(note_id):
     title = data.get("title")
     tagline = data.get("tagline")
     body = data.get("body")
-    pinned = data.get("pinned", False)
+    # Convert pinned to a boolean
+    pinned = bool(data.get("pinned", False))
 
     try:
         connection = get_db_connection()
