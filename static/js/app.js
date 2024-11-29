@@ -12,7 +12,17 @@ function fetchNotes() {
             if (!response.ok) throw new Error("Error fetching notes!");
             return response.json();
         })
-        .then(data => renderNotes(data))
+        .then(data => {
+            // Check if the required elements exist before rendering
+            const pinnedContainer = document.getElementById("pinned-notes");
+            const unpinnedContainer = document.getElementById("unpinned-notes");
+            
+            if (!pinnedContainer || !unpinnedContainer) {
+                throw new Error('Required DOM elements for notes not found!');
+            }
+
+            renderNotes(data);  // Call render if containers exist
+        })
         .catch(error => showError(error.message));
 }
 
