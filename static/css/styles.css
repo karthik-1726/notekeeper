@@ -16,6 +16,9 @@ body {
     border-radius: 12px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     animation: fadeIn 0.5s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
 }
 
 /* Page Title */
@@ -222,3 +225,18 @@ h1 {
     background-color: #d9534f;
 }
 
+/* Assuming you have styles.css linked */
+#pinned-notes,
+#unpinned-notes {
+    border: 1px solid #ccc;  /* Optional: Add borders for clarity */
+    padding: 15px;  /* Add padding inside containers */
+    background-color: #f9f9f9; /* Light background */
+}
+
+#pinned-notes {
+    margin-bottom: 20px; /* Space after pinned notes */
+}
+
+#unpinned-notes {
+    margin-top: 20px; /* Space before unpinned notes */
+}
