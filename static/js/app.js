@@ -13,10 +13,10 @@ function fetchNotes() {
             return response.json();
         })
         .then(data => {
-            // Check if the required elements exist before rendering
+            // Render notes only if containers exist
             const pinnedContainer = document.getElementById("pinned-notes");
             const unpinnedContainer = document.getElementById("unpinned-notes");
-            
+
             if (!pinnedContainer || !unpinnedContainer) {
                 throw new Error('Required DOM elements for notes not found!');
             }
@@ -31,7 +31,7 @@ function renderNotes({ pinned, unpinned }) {
     const pinnedContainer = document.getElementById("pinned-notes");
     const unpinnedContainer = document.getElementById("unpinned-notes");
 
-    // Clear containers
+    // Clear containers before rendering
     pinnedContainer.innerHTML = "";
     unpinnedContainer.innerHTML = "";
 
@@ -80,6 +80,7 @@ function addNote() {
         })
         .then(data => {
             showToast(data.message);
+            // After note added, fetch and render the updated list of notes
             fetchNotes();
             clearForm();
         })
@@ -130,12 +131,14 @@ function deleteNote(id) {
 // Show a toast message
 function showToast(message, type = "success") {
     const toast = document.getElementById("toast");
-    toast.textContent = message;
-    toast.className = `toast show ${type}`;
-
-    setTimeout(() => {
-        toast.className = "toast";
-    }, 3000); // Toast disappears after 3 seconds
+    if (toast) {
+        toast.textContent = message;
+        toast.className = `toast show ${type}`;
+        
+        setTimeout(() => {
+            toast.className = "toast";
+        }, 3000); // Toast disappears after 3 seconds
+    }
 }
 
 // Clear the form after adding a note
