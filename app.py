@@ -10,7 +10,6 @@ CORS(app)  # Enable CORS for cross-origin requests
 # Database connection function
 def get_db_connection():
     try:
-        # Use the external database URL provided for Render
         connection = psycopg2.connect(
             dbname="notekeeper_7c09",
             user="notekeeper_7c09_user",
@@ -68,7 +67,6 @@ def create_note():
     title = data.get("title")
     tagline = data.get("tagline")
     body = data.get("body")
-    # Convert pinned to a boolean
     pinned = bool(data.get("pinned", False))
 
     if not title or not body:
@@ -86,53 +84,55 @@ def create_note():
         cursor.close()
         connection.close()
 
-        return jsonify({"message": "Note created successfully!"}), 201
+        return jsonify({"message": "Note added successfully!"}), 201
     except Exception as e:
         app.logger.error(f"Error creating note: {e}")
-        return jsonify({"error": "Failed to create note"}), 500
+        return jsonify({"error": "Failed to add note"}), 500
 
-@app.route("/api/notes/<int:note_id>", methods=["PUT"])
-def update_note(note_id):
+@app.route("/api/notes/<int:id>", methods=["PUT"])
+def update_note(id):
     data = request.json
     title = data.get("title")
     tagline = data.get("tagline")
     body = data.get("body")
-    # Convert pinned to a boolean
     pinned = bool(data.get("pinned", False))
+
+    if not title or not body:
+        return jsonify({"error": "Title and body are required!"}), 400
 
     try:
         connection = get_db_connection()
         cursor = connection.cursor()
 
         cursor.execute(
-            """
-            UPDATE notes
-            SET title = %s, tagline = %s, body = %s, pinned = %s
-            WHERE id = %s
-        """,
-            (title, tagline, body, pinned, note_id),
+            "UPDATE notes SET title = %s, tagline = %s, body = %s, pinned = %s WHERE id = %s",
+            (title, tagline, body, pinned, id),
         )
         connection.commit()
         cursor.close()
         connection.close()
+
         return jsonify({"message": "Note updated successfully!"})
     except Exception as e:
         app.logger.error(f"Error updating note: {e}")
         return jsonify({"error": "Failed to update note"}), 500
 
-@app.route("/api/notes/<int:note_id>", methods=["DELETE"])
-def delete_note(note_id):
+@app.route("/api/notes/<int:id>", methods=["DELETE"])
+def delete_note(id):
     try:
         connection = get_db_connection()
         cursor = connection.cursor()
-        cursor.execute("DELETE FROM notes WHERE id = %s", (note_id,))
+
+        cursor.execute("DELETE FROM notes WHERE id = %s", (id,))
         connection.commit()
+
         cursor.close()
         connection.close()
+
         return jsonify({"message": "Note deleted successfully!"})
     except Exception as e:
         app.logger.error(f"Error deleting note: {e}")
         return jsonify({"error": "Failed to delete note"}), 500
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=int(os.getenv("PORT", 5000)))
+    app.run(debug=True)
