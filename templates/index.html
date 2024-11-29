@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Notekeeper</title>
     <link rel="stylesheet" href="/static/css/styles.css">
 </head>
+
 <body>
     <div class="container">
         <h1>Notekeeper</h1>
@@ -18,15 +20,20 @@
             </label>
             <button onclick="addNote()">Add Note</button>
         </div>
-        <div id="notes-grid"></div>
+
+        <!-- Separate containers for pinned and unpinned notes -->
+        <div id="pinned-notes" class="notes-container"></div>
+        <div id="unpinned-notes" class="notes-container"></div>
+
+        <!-- Pagination controls -->
         <div class="pagination">
-            <div id="pinned-notes"></div>
-            <div id="unpinned-notes"></div>
             <button onclick="prevPage()">Previous</button>
             <button onclick="nextPage()">Next</button>
         </div>
     </div>
+
     <div id="toast" class="toast"></div>
     <script src="/static/js/app.js"></script>
 </body>
+
 </html>
