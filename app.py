@@ -15,7 +15,7 @@ def get_db_connection():
             dbname="notekeeper_7c09",
             user="notekeeper_7c09_user",
             password="CFRNeEjIsRroI747Crtim2eKnDh7TjWm",
-            host="dpg-ct475t3tq21c7391ierg-a.singapore-postgres.render.com",  # External host
+            host="dpg-ct475t3tq21c7391ierg-a",  # External host
             port="5432"
         )
         return connection
