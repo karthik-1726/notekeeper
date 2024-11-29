@@ -10,16 +10,18 @@ CORS(app)  # Enable CORS for cross-origin requests
 # Database connection function
 def get_db_connection():
     try:
-        return psycopg2.connect(
-            dbname=os.getenv("DB_NAME"),
-            user=os.getenv("DB_USER"),
-            password=os.getenv("DB_PASSWORD"),
-            host=os.getenv("DB_HOST"),
-            port=os.getenv("DB_PORT")
+        # Use the external database URL provided for Render
+        connection = psycopg2.connect(
+            dbname="notekeeper_7c09",
+            user="notekeeper_7c09_user",
+            password="CFRNeEjIsRroI747Crtim2eKnDh7TjWm",
+            host="dpg-ct475t3tq21c7391ierg-a.singapore-postgres.render.com",  # External host
+            port="5432"
         )
+        return connection
     except Exception as e:
         app.logger.error(f"Database connection failed: {e}")
-        raise
+        raise  # Raise the error to ensure the app fails correctly if the connection fails
 
 # Health check
 @app.route("/health", methods=["GET"])
