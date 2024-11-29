@@ -21,12 +21,6 @@ function renderNotes({ pinned, unpinned }) {
     const pinnedContainer = document.getElementById("pinned-notes");
     const unpinnedContainer = document.getElementById("unpinned-notes");
 
-    // Check if containers exist
-    if (!pinnedContainer || !unpinnedContainer) {
-        console.error("Note containers not found in the DOM.");
-        return;
-    }
-
     // Clear containers
     pinnedContainer.innerHTML = "";
     unpinnedContainer.innerHTML = "";
@@ -60,26 +54,10 @@ function createNoteElement(note) {
 
 // Add a new note
 function addNote() {
-    const titleInput = document.getElementById("note-title");
-    const taglineInput = document.getElementById("note-tagline");
-    const bodyInput = document.getElementById("note-body");
-    const pinnedInput = document.getElementById("note-pinned");
-
-    // Check if form elements exist
-    if (!titleInput || !taglineInput || !bodyInput || !pinnedInput) {
-        showError("Form elements not found!");
-        return;
-    }
-
-    const title = titleInput.value.trim();
-    const tagline = taglineInput.value.trim();
-    const body = bodyInput.value.trim();
-    const pinned = pinnedInput.checked ? 1 : 0;
-
-    if (!title || !tagline || !body) {
-        showError("All fields are required!");
-        return;
-    }
+    const title = document.getElementById("note-title").value;
+    const tagline = document.getElementById("note-tagline").value;
+    const body = document.getElementById("note-body").value;
+    const pinned = document.getElementById("note-pinned").checked; // Boolean value
 
     fetch(`${BASE_URL}/api/notes`, {
         method: "POST",
@@ -103,17 +81,14 @@ function editNote(id) {
     const newTitle = prompt("Enter new title:");
     const newTagline = prompt("Enter new tagline:");
     const newBody = prompt("Enter new body:");
-    const isPinned = confirm("Is this note pinned?");
+    const isPinned = confirm("Is this note pinned?"); // Boolean value
 
-    if (!newTitle || !newBody || !newTagline) {
-        showError("All fields are required for editing!");
-        return;
-    }
+    if (!newTitle || !newBody || !newTagline) return;
 
     fetch(`${BASE_URL}/api/notes/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title: newTitle, tagline: newTagline, body: newBody, pinned: isPinned ? 1 : 0 })
+        body: JSON.stringify({ title: newTitle, tagline: newTagline, body: newBody, pinned: isPinned })
     })
         .then(response => {
             if (!response.ok) throw new Error("Failed to update note!");
@@ -145,11 +120,6 @@ function deleteNote(id) {
 // Show a toast message
 function showToast(message, type = "success") {
     const toast = document.getElementById("toast");
-    if (!toast) {
-        console.error("Toast element not found in the DOM.");
-        return;
-    }
-
     toast.textContent = message;
     toast.className = `toast show ${type}`;
 
@@ -160,15 +130,10 @@ function showToast(message, type = "success") {
 
 // Clear the form after adding a note
 function clearForm() {
-    const titleInput = document.getElementById("note-title");
-    const taglineInput = document.getElementById("note-tagline");
-    const bodyInput = document.getElementById("note-body");
-    const pinnedInput = document.getElementById("note-pinned");
-
-    if (titleInput) titleInput.value = "";
-    if (taglineInput) taglineInput.value = "";
-    if (bodyInput) bodyInput.value = "";
-    if (pinnedInput) pinnedInput.checked = false;
+    document.getElementById("note-title").value = "";
+    document.getElementById("note-tagline").value = "";
+    document.getElementById("note-body").value = "";
+    document.getElementById("note-pinned").checked = false;
 }
 
 // Error handling function
